@@ -1,7 +1,8 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-  const browser = await puppeteer.launch();
+  // { headless: false } will open the browser for debugging
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto('https://payment-ecpay.onrender.com/checkout');
   await page.waitForNavigation();
