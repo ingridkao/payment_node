@@ -20,7 +20,11 @@ router.get('/checkout', function(req, res, next) {
   html = generatePayment();
   res.render('checkout', { title: 'checkout', html});
 }
-);
+)
+.post('/return', function(req, res, next) {
+  console.log('req.body', req.body);
+  res.send('1|OK');
+});
 function generatePayment() {
   const { MERCHANTID, HASHKEY, HASHIV, HOST } = process.env;
   let date = new Date();
@@ -48,7 +52,7 @@ function generatePayment() {
     TradeDesc: '測試交易描述',
     ItemName: '測試商品等',
     ReturnURL: `${HOST}/return`,
-    // ClientBackURL: 'https://www.google.com',
+    ClientBackURL: `${HOST}/index.html`
   }
 
   const options = {
