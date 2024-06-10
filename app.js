@@ -8,7 +8,18 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+const port = process.env.PORT || 3000;
 
+app.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+
+app.listen(port, (err) => {
+  if (err) {
+    return console.error('Failed to start server:', err);
+  }
+  console.log(`Server is running on http://127.0.0.1:${port}`);
+});
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
