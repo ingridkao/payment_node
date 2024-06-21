@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <form id="loginForm">
+        <label for="email">Email:</label><br>
+        <input type="text" id="email" name="email"><br>
+        
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password"><br>
+        
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        var outdoorkaBack = '<%= OUTDOORKA_BACK %>';
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            var jsonData = {};
+            for (var [key, value] of formData.entries()) {
+                jsonData[key] = value;
+            }
+
+            fetch(outdoorkaBack +'/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem('token', data.data.token.access_token);
+                // Redirect to the next page
+                window.location.href = '/checkout-outdoor';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -16,6 +16,13 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+router.get('/login', function(req, res) {
+  res.render('login', { OUTDOORKA_BACK: process.env.OUTDOORKA_BACK })
+})
+router.get('/checkout-outdoor', function(req, res) {
+  res.render('checkout-outdoor', { OUTDOORKA_BACK: process.env.OUTDOORKA_BACK })
+})
+
 router.get('/checkout', function(req, res, next) {
   html = generatePayment();
   res.render('checkout', { title: 'checkout', html});

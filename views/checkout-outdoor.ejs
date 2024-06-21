@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outdoorka-payment</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #registrationForm {
+            width: 50%; /* or any other value */
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <form id="registrationForm">
+        <label for="activityId">Activity ID:</label>
+        <input type="text" id="activityId" name="activityId" value="664cb717ae8e74de4ae74871"><br>
+        
+        <label for="ticketCount">Ticket Count:</label>
+        <input type="number" id="ticketCount" name="ticketCount" value=1><br>
+        
+        <label for="buyerName">Buyer Name:</label>
+        <input type="text" id="buyerName" name="buyerName" value="BuyerName"><br>
+        
+        <label for="buyerMobile">Buyer Mobile:</label>
+        <input type="text" id="buyerMobile" name="buyerMobile" value="0911000111"><br>
+        
+        <label for="buyerEmail">Buyer Email:</label>
+        <input type="email" id="buyerEmail" name="buyerEmail" value="buyer@gmail.com"><br>
+        <button type="submit">Submit</button><br><br>
+        <div id="result"></div>
+    </form>
+    <script>
+        var outdoorkaBack = '<%= OUTDOORKA_BACK %>';
+        var token = localStorage.getItem('token');
+        console.log(outdoorkaBack);
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            var jsonData = {};
+            for (var [key, value] of formData.entries()) {
+                if (key === 'ticketCount') {
+                    jsonData[key] = Number(value);
+                } else {
+                    jsonData[key] = value;
+                }
+            }
+
+            fetch(outdoorkaBack +'/payments/registration', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(jsonData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('result').textContent = JSON.stringify(data);
+                var htmlString = data.data.html;
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(htmlString, 'text/html');
+                var form = doc.getElementById('_form_aiochk');
+                document.body.appendChild(form);
+                form.submit();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
