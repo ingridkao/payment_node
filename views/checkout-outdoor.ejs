@@ -38,12 +38,14 @@
         <label for="buyerEmail">Buyer Email:</label>
         <input type="email" id="buyerEmail" name="buyerEmail" value="buyer@gmail.com"><br>
         <button type="submit">Submit</button><br><br>
-        <div id="result"></div>
     </form>
+
+    <div id="result"></div>
+
     <script>
         var outdoorkaBack = '<%= OUTDOORKA_BACK %>';
-        var token = localStorage.getItem('token');
-        console.log(outdoorkaBack);
+        // var token = localStorage.getItem('token');
+        // console.log(outdoorkaBack);
         document.getElementById('registrationForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -57,23 +59,18 @@
                 }
             }
 
-            fetch(outdoorkaBack +'/payments/registration', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(jsonData),
+            fetch('/checkout')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.text()
             })
-            .then(response => response.json())
             .then(data => {
-                document.getElementById('result').textContent = JSON.stringify(data);
-                var htmlString = data.data.html;
-                var parser = new DOMParser();
-                var doc = parser.parseFromString(htmlString, 'text/html');
-                var form = doc.getElementById('_form_aiochk');
-                document.body.appendChild(form);
-                form.submit();
+                // 會傳送form表單
+                const formresult = document.getElementById('result')
+                formresult.innerHTML = data;
+                // 觸發submit
+                const formAction = document.getElementById('_form_aiochk')
+                formAction.submit();
             })
             .catch((error) => {
                 console.error('Error:', error);

@@ -2,29 +2,19 @@ var express = require('express');
 var router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 const ecpay_payment = require('ecpay_aio_nodejs');
-
 require('dotenv').config();
-
-function generateShortUuid() {
-    const uuid = uuidv4();
-    const shortUuid = uuid.replace(/-/g, '').substring(0, 20);
-    return shortUuid;
-}
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-router.get('/login', function(req, res) {
-  res.render('login', { OUTDOORKA_BACK: process.env.OUTDOORKA_BACK })
-})
 router.get('/checkout-outdoor', function(req, res) {
   res.render('checkout-outdoor', { OUTDOORKA_BACK: process.env.OUTDOORKA_BACK })
 })
 
 router.get('/checkout', function(req, res, next) {
-  html = generatePayment();
+  const html = generatePayment();
   res.render('checkout', { title: 'checkout', html});
 }
 )
@@ -32,6 +22,14 @@ router.get('/checkout', function(req, res, next) {
   console.log('req.body', req.body);
   res.send('1|OK');
 });
+
+function generateShortUuid() {
+  const uuid = uuidv4();
+  const shortUuid = uuid.replace(/-/g, '').substring(0, 20);
+  return shortUuid;
+}
+
+// 成立訂單
 function generatePayment() {
   const { MERCHANTID, HASHKEY, HASHIV, HOST } = process.env;
   let date = new Date();
@@ -49,12 +47,10 @@ function generatePayment() {
     hour12: false
   });
 
-  let MerchantTradeDate = `${formattedDate} ${formattedTime}`;
-  console.log(MerchantTradeDate);
   const MerchantTradeNo = generateShortUuid();
   let base_param = {
     MerchantTradeNo: MerchantTradeNo, //請帶20碼uid, ex: f0a0d7e9fae1bb72bc93
-    MerchantTradeDate: MerchantTradeDate, //ex: 2017/02/13 15:45:30
+    MerchantTradeDate: `${formattedDate} ${formattedTime}`, //ex: 2017/02/13 15:45:30
     TotalAmount: '100',
     TradeDesc: '測試交易描述',
     ItemName: '測試商品等',
@@ -80,8 +76,9 @@ function generatePayment() {
     "IsProjectContractor": false
   }
   const create = new ecpay_payment(options);
-  const html = create.payment_client.aio_check_out_all(base_param);
-  return html;
+  const HTML = create.payment_client.aio_check_out_all(base_param);
+  // 丟一個表單
+  return HTML;
 }
 
 module.exports = router;
